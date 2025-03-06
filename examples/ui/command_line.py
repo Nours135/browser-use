@@ -5,7 +5,7 @@ Example 1: Using OpenAI (default), with default task: 'go to reddit and search f
 python command_line.py
 
 Example 2: Using OpenAI with a Custom Query
-python command_line.py --query "go to google and search for browser-use"
+python command_line.py --query "go to google and search for browser-use" --provider deepseek
 
 Example 3: Using Anthropic's Claude Model with a Custom Query
 python command_line.py --query "find latest Python tutorials on Medium" --provider anthropic
@@ -27,6 +27,7 @@ from browser_use.controller.service import Controller
 
 
 load_dotenv()
+# import pdb; pdb.set_trace()
 
 def get_llm(provider: str):
 	if provider == 'anthropic':
@@ -46,6 +47,14 @@ def get_llm(provider: str):
         
 		return ChatOpenAI(model='gpt-4o', temperature=0.0)
 
+	elif provider == 'deepseek':
+		from langchain_openai import ChatOpenAI
+		from pydantic import SecretStr
+		api_key = os.getenv("DEEPSEEK_API_KEY")
+		if not api_key:
+			raise ValueError("Error: DEEPSEEK_API_KEY is not set. Please provide a valid API key.")
+		
+		return ChatOpenAI(base_url='https://api.deepseek.com/v1', model='deepseek-reasoner', api_key=SecretStr(api_key))
 	else:
 		raise ValueError(f'Unsupported provider: {provider}')
 
@@ -61,7 +70,7 @@ def parse_arguments():
     parser.add_argument(
         '--provider',
         type=str,
-        choices=['openai', 'anthropic'],
+        choices=['openai', 'anthropic', 'deepseek'],
         default='openai',
         help='The model provider to use (default: openai)',
     )
@@ -86,7 +95,7 @@ async def main():
     """Main async function to run the agent."""
     args = parse_arguments()
     agent, browser = initialize_agent(args.query, args.provider)
-
+    # import pdb; pdb.set_trace()
     await agent.run(max_steps=25)
     
     input('Press Enter to close the browser...')

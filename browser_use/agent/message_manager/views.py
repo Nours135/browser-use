@@ -56,7 +56,10 @@ class ManagedMessage(BaseModel):
 		"""
 		if isinstance(value, dict) and 'message' in value:
 			# NOTE: We use langchain's load to convert the JSON string back into a BaseMessage object.
-			value['message'] = load(value['message'])
+			if isinstance(value['message'], str):
+				value['message'] = load(value['message'])
+			elif isinstance(value['message'], dict) and 'content' in value['message']:  # ADD support for deepseek
+				value['message'] = load(value['message']['content'])
 		return value
 
 
