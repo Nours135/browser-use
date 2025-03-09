@@ -12,8 +12,9 @@ browser = Browser(
     config=BrowserConfig(
         # Specify the path to your Chrome executable
         # chrome_instance_path='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',  # macOS path
-        "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
-        # For Linux, typically: '/usr/bin/google-chrome'
+        #"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+        # chrome_instance_path='/usr/bin/google-chrome'
+        headless=False
     )
 )
 
@@ -32,3 +33,5 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
+
+    # xvfb-run --server-args='-screen 0 1280x1024x24' python test_task.py
