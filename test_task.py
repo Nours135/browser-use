@@ -10,6 +10,12 @@ import json
 from pydantic import SecretStr
 from browser_use import Agent, Controller
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--query", type=str, required=True)
+args = parser.parse_args()
+
 
 ds_api_key = os.getenv("DEEPSEEK_API_KEY")
 ds = ChatOpenAI(base_url='https://api.deepseek.com/v1', model='deepseek-reasoner', api_key=SecretStr(ds_api_key))
@@ -48,8 +54,9 @@ browser = Browser(
 )
 
 # Create the agent with your configured browser
+# Go to google, search for good projects and papers that help students to learn reinforcement learning. Go to google docs, log in my account, create a new doc, save the projects and papers in it. Ask me for help if necessary
 agent = Agent(
-    task="Go to google, search for good projects and papers that help students to learn reinforcement learning. Go to google docs, log in my account, create a new doc, save the projects and papers in it. Ask me for help if necessary",
+    task=args.query,
     llm=ds,
     browser=browser,
     controller=controller,
@@ -64,4 +71,5 @@ async def main():
 if __name__ == '__main__':
     asyncio.run(main())
 
-    # xvfb-run --server-args='-screen 0 1280x1024x24' python test_task.py
+    # conda activate BU && cd /share/browerUse/browser-use && xvfb-run --server-args='-screen 0 1280x1024x24' python test_task.py --query "Go to youtube, get the recommonded videos, save the url and video information in a txt file"
+

@@ -374,12 +374,19 @@ class Agent(Generic[Context]):
 				await self._raise_if_stopped_or_paused()
 
 				self._message_manager.add_model_output(model_output)
+
+				model_sucess = True
 			except Exception as e:
 				# model call failed, remove last state message from history
 				self._message_manager._remove_last_state_message()
-				raise e
+				# raise e
+				model_sucess = False
+				error_msg = str(e)
 
-			result: list[ActionResult] = await self.multi_act(model_output.action)
+			if model_sucess:
+				result: list[ActionResult] = await self.multi_act(model_output.action)
+			else:
+				result = [ActionResult(is_done=False, success=False, error=error_msg, include_in_memory=True)]
 
 			self.state.last_result = result
 
